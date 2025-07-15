@@ -1,4 +1,89 @@
 html {
   height: 100%;
   width: 100%;
+  font-family: Helvetica, sans-serif, monospace;
+  font-size: 32px;
+}
+
+body {
+  margin: 1rem;
+}
+
+ul {
+  min-height: 1rem;
+  list-style-type: none;
+  padding-inline-start: 0.5rem;
+}
+
+p>span,
+li>span {
+  margin-left: 1rem;
+}
+
+p>span:first-child,
+li>span:first-child {
+  margin-left: 0;
+}
+
+.controls {
+  margin-top: 1rem;
+  display: inline-block;
+}
+
+.controls>button {
+  margin-left: 1rem;
+}
+
+select {
+  font-size: 1rem;
+  border-width: 3px;
+  padding: 0.125rem 0.5rem 0.25rem 0.25rem;
+  border-radius: 0.25rem;
+}
+
+select:hover {
+  background-color: #cdf;
+}
+
+.location {
+  font-weight: 500;
+  display: inline-block;
+  min-width: 50%;
+}
+
+#add-clock-btn {
+  font-family: monospace;
+  font-size: 1rem;
+  padding: 0.125rem 0.25rem 0.25rem 0.25rem;
+  text-align: center;
+  border-radius: 0.25rem;
+  border-width: 3px;
+  background-color: #9ac;
+}
+
+#add-clock:hover {
+  background-color: #abd;
+}
+
+#add-clock:active {
+  background-color: #cdf;
+}
+
+.delete-btn {
+  font-family: monospace;
+  font-size: 0.5rem;
+  text-align: center;
+  border-radius: 1rem;
+  border-width: 3px;
+  background-color: #f66;
+  padding: 0.125rem 0.25rem;
+}
+
+.delete-btn:hover {
+  background-color: #f88;
+}
+
+.delete-btn:active {
+  background-color: #f00;
+  color: white;
 }

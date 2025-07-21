@@ -12,7 +12,7 @@ body {
 ul {
   min-height: 1rem;
   list-style-type: none;
-  padding-inline-start: 0.5rem;
+  padding-inline-start: 0;
 }
 
 p>span,
@@ -43,6 +43,12 @@ select {
 
 select:hover {
   background-color: #cdf;
+}
+
+.clock {
+  font-family: monospace;
+  font-weight: 300;
+  display: inline-block;
 }
 
 .location {

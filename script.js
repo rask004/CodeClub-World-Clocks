@@ -1,20 +1,26 @@
+const MS_PER_SEC = 1000;
+const MS_PER_MIN = 60 * MS_PER_SEC;
+const MS_PER_HOUR = 60 * 60 * MS_PER_SEC;
+const HOURS_PER_DAY = 24;
+const DAYNAME = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
 // relative to UTC
 const clockOptions = {
-  "Buenos Aires": -3,
-  "England": 1,
-  "Fiji": 13,
-  "Los Angeles, USA": -7,
-  "New Delhi, India": 6,
-  "New Zealand": 12,
-  "Samoa": 13,
-  "Tokyo, Japan": 9,  
-  "Washington, USA": -4,
+  "Buenos Aires": -3 * MS_PER_HOUR,
+  "England": 1 * MS_PER_HOUR,
+  "Fiji": 13 * MS_PER_HOUR,
+  "Los Angeles, USA": -7  * MS_PER_HOUR,
+  "New Delhi, India": 6 * MS_PER_HOUR,
+  "New Zealand": 12 * MS_PER_HOUR,
+  "New Zealand (Chatham Is.)": 12 * MS_PER_HOUR + 45 * MS_PER_MIN,
+  "Samoa": 13 * MS_PER_HOUR,
+  "Tokyo, Japan": 9 * MS_PER_HOUR,  
+  "Washington, USA": -4 * MS_PER_HOUR,
 }
 
-let hours;
-let minutes;
-let seconds;
 let offset;
+let timestamp;
+
 
 
 const initialiseClockSelections = () => {
@@ -29,67 +35,58 @@ const initialiseClockSelections = () => {
 
 const initialiseLocalOffset = () => {
   const time = new Date();
-  // convert offset to hours
-  offset = Math.floor(time.getTimezoneOffset() / 60);
+  // convert offset to milliseconds
+  offset = time.getTimezoneOffset() * MS_PER_MIN;
   if (offset < 0) {
-    offset += 24;
+    offset += (HOURS_PER_DAY * MS_PER_HOUR);
   }
 }
 
 const pollTime = () => {
   const time = new Date();
-  hours = time.getUTCHours();
-  minutes = time.getUTCMinutes();
-  seconds = time.getUTCSeconds();
-  // console.log("time polled!")
+  timestamp = time.getTime();
+  timestamp -= timestamp % MS_PER_SEC;
 }
 
-const getTimeString = (h, m, s) => {
-  console.log(h, m, s);
-  let tzHours = h % 24;
+const getTimeString = (t) => {
+  let tzHours = Math.floor(t / MS_PER_HOUR) % 24;
+  let m = Math.floor(t / MS_PER_MIN) % 60;
+  let s = Math.floor(t / MS_PER_SEC) % 60;
   if (tzHours < 0) {
-    tzHours += 24;
+    tzHours += HOURS_PER_DAY;
   }
   let timeAmPm = "AM";
   if (tzHours > 12) {
     timeAmPm = "PM";
   }
   let hoursAmPm = tzHours % 12;
-  if (hoursAmPm == 0) {
+  if (hoursAmPm === 0) {
     hoursAmPm = 12;
   }
-  let timeString = `${hoursAmPm.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")} ${timeAmPm}`;
+  let day = (new Date(t)).getDay();
+  
+  let timeString = `${DAYNAME[day].toUpperCase()}\t${hoursAmPm.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")} ${timeAmPm}`;
   return timeString;
 }
 
 const showTime = () => {
-  const baseTimeString = getTimeString(hours + offset, minutes, seconds);
+  const baseTimeString = getTimeString(timestamp + offset);
   document.querySelector("#local-clock").innerHTML = baseTimeString;
   const worldClockList = document.querySelector('#world-clocks');
   for (const child of worldClockList.children) {
     const tz = parseInt(child.children[1].innerHTML);
-    const clockTimeString = getTimeString(hours + tz, minutes, seconds);
+    const clockTimeString = getTimeString(timestamp + tz);
     child.children[0].innerHTML = clockTimeString;
   }
 }
 
 const updateTime = () => {
-  seconds += 1;
-  if (seconds == 60) {
-    minutes += 1;
-    seconds = 0;
-  }
-  if (minutes == 60) {
-    hours += 1;
-    minutes = 0;
-  }
-  if (hours >= 24) {
-    hours = 0;
-  }
+  timestamp += MS_PER_SEC;
 }
 
 const addClock = (tzLocation) => {
   // search for existing clock with this location
+  console.log("Add clock: ", tzLocation)
   const spans = document.querySelectorAll("span.location");
   for (const e of spans) {
     if (e.innerHTML == tzLocation) {
@@ -105,6 +102,7 @@ const addClock = (tzLocation) => {
   newElement.appendChild(newSpanTZ);
   newElement.appendChild(newSpanName);
   newElement.appendChild(newButtonDelete);
+  newSpanClock.className = "clock";
   newSpanTZ.toggleAttribute("hidden")
   newSpanName.className = "location";
   const tz = clockOptions[tzLocation];
@@ -115,6 +113,7 @@ const addClock = (tzLocation) => {
   newButtonDelete.className = "delete-btn";
   newButtonDelete.addEventListener('click', () => {
     document.querySelector('#world-clocks').removeChild(newElement);
+    console.log("Remove Clock: ", tzLocation);
   });
   document.querySelector('#world-clocks').appendChild(newElement);
   showTime();
@@ -128,10 +127,10 @@ window.onload = () => {
   setInterval(() => {
     updateTime();
     showTime();
-  }, 1000);
+  }, MS_PER_SEC);
   setInterval(() => {
     pollTime();
-  }, 60000);
+  }, 15 * MS_PER_MIN);
   document.querySelector("#add-clock-btn").addEventListener('click', () => {
     const select = document.querySelector("#clock-select");
     const tzLocation = select.value;

@@ -131,7 +131,7 @@ window.onload = () => {
   setInterval(() => {
     pollTime();
   }, 15 * MS_PER_MIN);
-  document.querySelector("#add-clock-btn").addEventListener('click', () => {
+  document.querySelector("#add-clock").addEventListener('click', () => {
     const select = document.querySelector("#clock-select");
     const tzLocation = select.value;
     addClock(tzLocation);
